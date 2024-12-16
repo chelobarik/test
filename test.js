@@ -21,7 +21,7 @@ class Api {
 	#api_base_path = ""
 
 	constructor(api_base_path) {
-		this.api_base_path = api_base_path ?? ''
+		this.#api_base_path = api_base_path ?? ''
 	}
 
 	/**
