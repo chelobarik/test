@@ -13,23 +13,26 @@
 /**
  * Класс для работы с API
  *
- * @author		User Name
- * @version		v.1.0 (dd/mm/yyyy)
+ * @author	User Name
+ * @version	v.1.0 (dd/mm/yyyy)
  */
 class Api {
-	#error_handler_func = null
+	#error_handler = null
+	#api_base_path = ""
 
-	constructor() {}
+	constructor(api_base_path) {
+		this.api_base_path = api_base_path ?? ''
+	}
 
 	/**
 	 * Устанавливает внешний обработчик ошибок
 	 *
-	 * @author		VK
-	 * @version		v.1.0 (dd/mm/yyyy)
+	 * @author	VK
+	 * @version	v.1.0 (dd/mm/yyyy)
 	 * @param {function} handler
 	 */
 	set_error_handler(handler) {
-		this.#error_handler_func = handler
+		this.#error_handler = handler
 	}
 
 	/**
@@ -39,18 +42,18 @@ class Api {
 	 * @version		v.1.0 (dd/mm/yyyy)
 	 */
 	error_handler() {
-		if (this.#error_handler_func) {
-			this.#error_handler_func(arguments)
+		if (this.#error_handler) {
+			this.#error_handler(arguments)
 		}
 	}
 
 	/**
 	 * Заполняет строковый шаблон template данными из объекта object
 	 *
-	 * @author		User Name
-	 * @version		v.1.0 (dd/mm/yyyy)
-	 * @param		{object} object
-	 * @param		{string} template
+	 * @author	User Name
+	 * @version	v.1.0 (dd/mm/yyyy)
+	 * @param	{object} object
+	 * @param	{string} template
 	 * @return	{string}
 	 */
 	get_api_path(object, template) {
@@ -59,14 +62,17 @@ class Api {
 			return ""
 		}
 
-		return template.replaceAll(/(%)(\w+)(%)/g, (_match, _p, key) => {
-			if (!object[key]) {
-				this.error_handler("Invalid template key: " + key)
-				return "%" + key + "%"
-			}
+		return (
+			this.#api_base_path +
+			template.replaceAll(/(%)(\w+)(%)/g, (_match, _p, key) => {
+				if (!object[key]) {
+					this.error_handler("Invalid template key: " + key)
+					return "%" + key + "%"
+				}
 
-			return encodeURIComponent(object[key])
-		})
+				return encodeURIComponent(object[key])
+			})
+		)
 	}
 }
 
@@ -103,7 +109,7 @@ let expected_result = [
 ]
 
 /*
-* Протестируем, но я бы расширил варианты см. ниже
+// * Протестируем, но я бы расширил варианты см. ниже
 
 import { expect, test } from 'vitest'
 
